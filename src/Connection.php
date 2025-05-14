@@ -18,7 +18,7 @@ use Smalot\Smtp\Server\Event\ConnectionHeloReceivedEvent;
 use Smalot\Smtp\Server\Event\ConnectionLineReceivedEvent;
 use Smalot\Smtp\Server\Event\ConnectionRcptReceivedEvent;
 use Smalot\Smtp\Server\Event\MessageReceivedEvent;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -274,7 +274,7 @@ class Connection extends Stream implements ConnectionInterface
     protected function dispatchEvent($eventName, Event $event)
     {
         if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
         }
 
         return $this;
@@ -414,7 +414,11 @@ class Connection extends Stream implements ConnectionInterface
      */
     protected function handleAuthCommand($method)
     {
-        list($method, $token) = explode(' ', trim($method), 2);
+        $data = explode(' ', trim($method), 2);
+
+        $method = isset($data[0]) ? $data[0] : null;
+        $token = isset($data[1]) ? $data[1] : null;
+
 
         switch (strtoupper($method)) {
             case self::AUTH_METHOD_PLAIN:
@@ -452,6 +456,7 @@ class Connection extends Stream implements ConnectionInterface
      */
     protected function handleLoginCommand($value)
     {
+
         if (!$this->authMethod) {
             $this->sendReply(530, '5.7.0 Authentication required');
             return;
@@ -629,8 +634,10 @@ class Connection extends Stream implements ConnectionInterface
      */
     protected function checkAuth()
     {
+
         if ($this->server->checkAuth($this, $this->authMethod)) {
             $this->login = $this->authMethod->getUsername();
+
             $this->changeState(self::STATUS_INIT);
             $this->sendReply(235, '2.7.0 Authentication successful');
 

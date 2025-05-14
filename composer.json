@@ -1,5 +1,5 @@
 {
-    "name": "smalot/smtp-server",
+    "name": "nietthijmen/smtp-server",
     "description" : "SMTP Server based on ReactPHP",
     "keywords": ["smtp", "server", "reactphp", "event", "parse"],
     "license" : "MIT",
@@ -13,7 +13,7 @@
     "require": {
         "react/event-loop": "^0.4.2",
         "react/socket": "^0.4.3",
-        "symfony/event-dispatcher": "^3.2",
+        "symfony/event-dispatcher": "*",
         "monolog/monolog": "^1.0"
     },
     "suggest": {
